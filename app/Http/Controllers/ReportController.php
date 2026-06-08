@@ -26,7 +26,7 @@ class ReportController extends Controller
 
         // Apply filters
         if ($request->filled('date')) {
-            $query->whereDate('date', $request->date);
+            $query->whereDate('date', '>=', $request->date);
         }
 
         if ($request->filled('driver')) {
@@ -61,7 +61,7 @@ class ReportController extends Controller
             'driver',
             'truck',
             'dispatches' => function ($query) {
-                $query->orderBy('order_index');
+                $query->where('status', 'entregado')->orderBy('order_index');
             },
             'dispatches.client',
             'dispatches.products'
