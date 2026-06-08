@@ -14,8 +14,8 @@ export default function Welcome({ auth }) {
                 <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex flex-col min-h-screen">
                     <header className="flex justify-between items-center py-8">
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center justify-center">
-                                <img src="/logo.png" alt="dTrackers" className="h-12 w-auto object-contain" />
+                            <div className="flex items-center justify-center bg-white/90 p-1.5 rounded-xl shadow-lg">
+                                <img src="/logo.png" alt="Logo dTrackers" className="h-14 w-auto object-contain drop-shadow" />
                             </div>
                             <span className="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
                                 dTrackers
