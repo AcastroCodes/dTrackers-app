@@ -43,4 +43,12 @@ class Company extends Model
     {
         return $this->hasMany(Client::class);
     }
+
+    /**
+     * Get the routes that belong to this company.
+     */
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class);
+    }
 }
