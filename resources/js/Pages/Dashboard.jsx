@@ -127,38 +127,86 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                     </div>
                     {companiesStats.map(company => (
                         <div key={company.id} className="col-12 mb-4">
-                            <div className="card shadow-sm" style={{ borderLeft: '4px solid #51cbce' }}>
-                                <div className="card-header pb-0">
-                                    <h5 className="card-title text-dark font-weight-bold mb-0">{company.name}</h5>
+                            <h5 className="mb-3 text-dark font-weight-bold" style={{ borderLeft: '4px solid #51cbce', paddingLeft: '10px' }}>
+                                {company.name}
+                            </h5>
+                            <div className="row">
+                                {/* Usuarios */}
+                                <div className="col-lg-3 col-md-6 col-sm-6">
+                                    <div className="card card-stats shadow-sm">
+                                        <div className="card-body">
+                                            <div className="row">
+                                                <div className="col-5 col-md-4">
+                                                    <div className="icon-big text-center icon-warning">
+                                                        <i className="nc-icon nc-single-02 text-warning"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col-7 col-md-8">
+                                                    <div className="numbers">
+                                                        <p className="card-category">Usuarios</p>
+                                                        <p className="card-title">{company.users_count}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="card-body pt-3">
-                                    <div className="row text-center">
-                                        <div className="col-md-3 col-6 mb-2">
-                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                                                <i className="nc-icon nc-single-02 text-secondary d-block mb-2" style={{ fontSize: '28px' }}></i>
-                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.users_count}</h3>
-                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Usuarios</span>
+                                {/* Choferes */}
+                                <div className="col-lg-3 col-md-6 col-sm-6">
+                                    <div className="card card-stats shadow-sm">
+                                        <div className="card-body">
+                                            <div className="row">
+                                                <div className="col-5 col-md-4">
+                                                    <div className="icon-big text-center icon-warning">
+                                                        <i className="nc-icon nc-badge text-success"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col-7 col-md-8">
+                                                    <div className="numbers">
+                                                        <p className="card-category">Choferes</p>
+                                                        <p className="card-title">{company.drivers_count}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="col-md-3 col-6 mb-2">
-                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                                                <i className="nc-icon nc-badge text-info d-block mb-2" style={{ fontSize: '28px' }}></i>
-                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.drivers_count}</h3>
-                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Choferes</span>
+                                    </div>
+                                </div>
+                                {/* Camiones */}
+                                <div className="col-lg-3 col-md-6 col-sm-6">
+                                    <div className="card card-stats shadow-sm">
+                                        <div className="card-body">
+                                            <div className="row">
+                                                <div className="col-5 col-md-4">
+                                                    <div className="icon-big text-center icon-warning">
+                                                        <i className="nc-icon nc-delivery-fast text-danger"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col-7 col-md-8">
+                                                    <div className="numbers">
+                                                        <p className="card-category">Camiones</p>
+                                                        <p className="card-title">{company.trucks_count}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="col-md-3 col-6 mb-2">
-                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                                                <i className="nc-icon nc-delivery-fast text-danger d-block mb-2" style={{ fontSize: '28px' }}></i>
-                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.trucks_count}</h3>
-                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Camiones</span>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-3 col-6 mb-2">
-                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                                                <i className="nc-icon nc-pin-3 text-success d-block mb-2" style={{ fontSize: '28px' }}></i>
-                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.routes_count}</h3>
-                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Rutas</span>
+                                    </div>
+                                </div>
+                                {/* Rutas */}
+                                <div className="col-lg-3 col-md-6 col-sm-6">
+                                    <div className="card card-stats shadow-sm">
+                                        <div className="card-body">
+                                            <div className="row">
+                                                <div className="col-5 col-md-4">
+                                                    <div className="icon-big text-center icon-warning">
+                                                        <i className="nc-icon nc-pin-3 text-primary"></i>
+                                                    </div>
+                                                </div>
+                                                <div className="col-7 col-md-8">
+                                                    <div className="numbers">
+                                                        <p className="card-category">Rutas</p>
+                                                        <p className="card-title">{company.routes_count}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
