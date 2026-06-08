@@ -17,7 +17,7 @@ class ReportController extends Controller
         $user = $request->user();
 
         if ($user->isDriver()) {
-            abort(403, 'No tienes permiso para acceder a los reportes.');
+            abort(403);
         }
         
         $query = Route::with(['company', 'driver', 'truck'])
@@ -54,7 +54,7 @@ class ReportController extends Controller
     {
         $user = $request->user();
 
-        if ($user->isDriver()) {
+        if ($user->role === 'chofer') {
             abort(403, 'No tienes permiso para descargar reportes.');
         }
 
