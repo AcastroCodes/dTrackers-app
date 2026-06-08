@@ -25,8 +25,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className="logo">
                     <Link href="/" className="simple-text logo-mini">
                         <div className="logo-image-small">
-                            {/* Assuming we just put a placeholder D for dTrackers */}
-                            <span style={{fontWeight: 'bold', fontSize: '18px'}}>D</span>
+                            <img src="/logo.png" alt="dTrackers" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                         </div>
                     </Link>
                     <Link href="/" className="simple-text logo-normal">
