@@ -154,7 +154,7 @@
         <thead>
             <tr>
                 <th style="width: 5%;">#</th>
-                <th style="width: 25%;">Cliente / Dirección</th>
+                <th style="width: 25%;">Cliente</th>
                 <th style="width: 30%;">Productos Entregados</th>
                 <th style="width: 30%;">Observaciones del Chofer</th>
                 <th style="width: 10%;">Estado</th>
@@ -171,8 +171,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>
-                        <strong>{{ $dispatch->client ? $dispatch->client->name : 'Cliente Desconocido' }}</strong><br>
-                        <span style="font-size: 10px; color: #555;">{{ $dispatch->client ? $dispatch->client->address : '' }}</span>
+                        <strong>{{ $dispatch->client ? $dispatch->client->name : 'Cliente Desconocido' }}</strong>
                     </td>
                     <td>
                         @if($dispatch->products && $dispatch->products->count() > 0)
