@@ -6,6 +6,9 @@
 
         <title inertia>{{ config('app.name', 'Laravel Paper Dashboard') }}</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="/logo.png">
+
         <!-- Fonts and icons -->
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
