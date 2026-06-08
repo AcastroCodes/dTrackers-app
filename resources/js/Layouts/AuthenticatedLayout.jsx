@@ -160,7 +160,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             </nav>
                             <div className="credits ml-auto">
                                 <span className="copyright">
-                                    © {new Date().getFullYear()}, made with <i className="fa fa-heart heart"></i> Aristides Castro
+                                    © {new Date().getFullYear()}, made with Aristides Castro
                                 </span>
                             </div>
                         </div>
