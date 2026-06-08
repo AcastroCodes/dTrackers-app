@@ -126,30 +126,42 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                         </h5>
                     </div>
                     {companiesStats.map(company => (
-                        <div key={company.id} className="col-lg-3 col-md-6 col-sm-12 mb-3">
-                            <div className="card h-100 shadow-sm" style={{ borderTop: '4px solid #51cbce' }}>
+                        <div key={company.id} className="col-12 mb-4">
+                            <div className="card shadow-sm" style={{ borderLeft: '4px solid #51cbce' }}>
                                 <div className="card-header pb-0">
-                                    <h6 className="card-title text-dark font-weight-bold">{company.name}</h6>
+                                    <h5 className="card-title text-dark font-weight-bold mb-0">{company.name}</h5>
                                 </div>
-                                <div className="card-body pt-2">
-                                    <ul className="list-group list-group-flush">
-                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
-                                            <span className="text-muted"><i className="nc-icon nc-single-02 mr-1"></i> Usuarios</span>
-                                            <span className="badge badge-secondary badge-pill">{company.users_count}</span>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
-                                            <span className="text-muted"><i className="nc-icon nc-badge mr-1"></i> Choferes</span>
-                                            <span className="badge badge-info badge-pill">{company.drivers_count}</span>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
-                                            <span className="text-muted"><i className="nc-icon nc-delivery-fast mr-1"></i> Camiones</span>
-                                            <span className="badge badge-danger badge-pill">{company.trucks_count}</span>
-                                        </li>
-                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
-                                            <span className="text-muted"><i className="nc-icon nc-pin-3 mr-1"></i> Rutas</span>
-                                            <span className="badge badge-success badge-pill">{company.routes_count}</span>
-                                        </li>
-                                    </ul>
+                                <div className="card-body pt-3">
+                                    <div className="row text-center">
+                                        <div className="col-md-3 col-6 mb-2">
+                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
+                                                <i className="nc-icon nc-single-02 text-secondary d-block mb-2" style={{ fontSize: '28px' }}></i>
+                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.users_count}</h3>
+                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Usuarios</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 col-6 mb-2">
+                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
+                                                <i className="nc-icon nc-badge text-info d-block mb-2" style={{ fontSize: '28px' }}></i>
+                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.drivers_count}</h3>
+                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Choferes</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 col-6 mb-2">
+                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
+                                                <i className="nc-icon nc-delivery-fast text-danger d-block mb-2" style={{ fontSize: '28px' }}></i>
+                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.trucks_count}</h3>
+                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Camiones</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 col-6 mb-2">
+                                            <div className="p-3 border rounded" style={{ backgroundColor: '#f8f9fa' }}>
+                                                <i className="nc-icon nc-pin-3 text-success d-block mb-2" style={{ fontSize: '28px' }}></i>
+                                                <h3 className="mb-1 font-weight-bold" style={{ color: '#2c2c2c' }}>{company.routes_count}</h3>
+                                                <span className="text-muted text-uppercase font-weight-bold" style={{ fontSize: '11px', letterSpacing: '1px' }}>Rutas</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
