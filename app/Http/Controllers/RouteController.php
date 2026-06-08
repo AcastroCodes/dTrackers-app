@@ -20,14 +20,12 @@ class RouteController extends Controller
     {
         $authUser = Auth::user();
 
+        if ($authUser->isDriver()) {
+            return redirect()->route('dashboard');
+        }
+
         if ($authUser->isSuperAdmin()) {
             $routes = Route::with(['company', 'truck', 'driver', 'dispatches'])->latest()->get();
-        } else if ($authUser->isDriver()) {
-            $routes = Route::with(['company', 'truck', 'driver', 'dispatches.client'])
-                ->where('user_id', $authUser->id)
-                ->where('date', '>=', today())
-                ->latest()
-                ->get();
         } else {
             // Admin
             $routes = Route::with(['company', 'truck', 'driver', 'dispatches'])
@@ -38,7 +36,7 @@ class RouteController extends Controller
 
         return Inertia::render('Routes/Index', [
             'routes' => $routes,
-            'isDriver' => $authUser->isDriver(),
+            'isDriver' => false,
         ]);
     }
 
@@ -384,5 +382,16 @@ class RouteController extends Controller
         }
 
         return redirect()->back()->with('message', 'Ruta iniciada correctamente.');
+    }
+    public function finishRoute(Request $request, Route $route)
+    {
+        $authUser = Auth::user();
+        if ($authUser->isDriver() && $route->user_id !== $authUser->id) abort(403);
+        if (!$authUser->isSuperAdmin() && !$authUser->isDriver() && $route->company_id !== $authUser->company_id) abort(403);
+
+        $route->status = 'completada';
+        $route->save();
+
+        return redirect()->back()->with('message', 'Ruta finalizada correctamente.');
     }
 }

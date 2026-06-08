@@ -70,6 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('clients', ClientController::class);
     Route::resource('routes', RouteController::class);
     Route::post('routes/{route}/start', [RouteController::class, 'startRoute'])->name('routes.start');
+    Route::post('routes/{route}/finish', [RouteController::class, 'finishRoute'])->name('routes.finish');
     Route::post('routes/dispatches/{dispatch}/mark-delivered', [RouteController::class, 'markDispatchDelivered'])->name('dispatches.mark_delivered');
 });
 

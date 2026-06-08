@@ -108,9 +108,10 @@ export default function Create({ companies, clients, trucks, drivers, isSuperAdm
     const companyDisplayName = selectedCompany ? selectedCompany.name : 'Sede de la Empresa';
 
     // Filter dependent dropdowns based on selected company (for SuperAdmin)
-    const filteredClients = isSuperAdmin && data.company_id 
+    const dispatchedClientIds = data.dispatches.map(d => d.client_id.toString());
+    const filteredClients = (isSuperAdmin && data.company_id 
         ? allClients.filter(c => c.company_id == data.company_id) 
-        : allClients;
+        : allClients).filter(c => !dispatchedClientIds.includes(c.id.toString()));
     
     const filteredTrucks = isSuperAdmin && data.company_id 
         ? trucks.filter(t => t.company_id == data.company_id) 

@@ -14,6 +14,46 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+const ClientMap = ({ client }) => {
+    const mapRef = useRef(null);
+    const mapInstanceRef = useRef(null);
+
+    useEffect(() => {
+        if (!mapRef.current || !client?.latitude || !client?.longitude) return;
+
+        if (!mapInstanceRef.current) {
+            mapInstanceRef.current = L.map(mapRef.current).setView([parseFloat(client.latitude), parseFloat(client.longitude)], 15);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(mapInstanceRef.current);
+            const markerIcon = L.divIcon({
+                className: '',
+                html: `<div class="w-6 h-6 rounded-full border-2 border-white shadow-md flex items-center justify-center font-bold text-white bg-indigo-500 text-xs"></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+            L.marker([parseFloat(client.latitude), parseFloat(client.longitude)], { icon: markerIcon }).addTo(mapInstanceRef.current);
+        } else {
+            mapInstanceRef.current.setView([parseFloat(client.latitude), parseFloat(client.longitude)], 15);
+        }
+
+        setTimeout(() => {
+            if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize();
+        }, 100);
+
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+    }, [client]);
+
+    if (!client?.latitude || !client?.longitude) {
+        return <div className="w-full h-full bg-gray-50 flex items-center justify-center text-sm text-gray-400">Sin coordenadas GPS</div>;
+    }
+
+    return <div ref={mapRef} className="w-full h-full z-0" style={{ isolation: 'isolate' }}></div>;
+};
+
 export default function Home({ assignedRoutes }) {
     const mapRef = useRef(null);
     const mapInstanceRef = useRef(null);
@@ -30,6 +70,14 @@ export default function Home({ assignedRoutes }) {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDispatch, setSelectedDispatch] = useState(null);
+
+    const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+    const [selectedClientInfo, setSelectedClientInfo] = useState(null);
+
+    const openClientInfoModal = (client) => {
+        setSelectedClientInfo(client);
+        setIsInfoModalOpen(true);
+    };
 
     // Form for dispatch button
     const { data, setData, post, processing, reset } = useForm({
@@ -50,9 +98,50 @@ export default function Home({ assignedRoutes }) {
 
     const activeRoute = assignedRoutes.find(r => r.id === parseInt(selectedRouteId));
 
+    // Timer state
+    const [elapsedTime, setElapsedTime] = useState('00:00:00');
+
+    // Timer Logic
+    useEffect(() => {
+        let interval;
+        if (activeRoute && activeRoute.started_at && activeRoute.status !== 'completada') {
+            const start = new Date(activeRoute.started_at).getTime();
+            interval = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = now - start;
+                if (diff > 0) {
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                    setElapsedTime(
+                        `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+                    );
+                }
+            }, 1000);
+        } else if (activeRoute && activeRoute.status === 'completada' && activeRoute.updated_at) {
+            const start = new Date(activeRoute.started_at).getTime();
+            const end = new Date(activeRoute.updated_at).getTime();
+            const diff = end - start;
+            if (diff > 0) {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                setElapsedTime(`${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+            }
+        } else {
+            setElapsedTime('00:00:00');
+        }
+        return () => clearInterval(interval);
+    }, [activeRoute]);
+
     const handleStartRoute = () => {
         if (!activeRoute) return;
         router.post(window.route('routes.start', activeRoute.id), {}, { preserveScroll: true });
+    };
+
+    const handleFinishRoute = () => {
+        if (!activeRoute || !confirm('¿Estás seguro de finalizar esta ruta?')) return;
+        router.post(window.route('routes.finish', activeRoute.id), {}, { preserveScroll: true });
     };
 
     const openDispatchModal = (dispatch) => {
@@ -89,66 +178,74 @@ export default function Home({ assignedRoutes }) {
         setData('products', newProducts);
     };
 
-    // Header Content Component
-    const headerLeft = (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex items-center gap-2">
+    // Header Right (Selectors)
+    const headerRight = (
+        <div className="flex items-center gap-1 sm:gap-2">
+            <select 
+                value={selectedDate} 
+                onChange={e => setSelectedDate(e.target.value)}
+                className="uppercase bg-indigo-50 border border-indigo-100 text-indigo-700 pl-2 pr-8 sm:pl-3 sm:pr-10 py-1 sm:py-1.5 rounded-lg font-semibold text-xs sm:text-sm focus:ring-0 focus:border-indigo-300"
+            >
+                {uniqueDates.length === 0 && <option value="">SIN RUTAS</option>}
+                {uniqueDates.map(date => (
+                    <option key={date} value={date}>{new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</option>
+                ))}
+            </select>
+
+            {routesForDate.length > 1 && (
                 <select 
-                    value={selectedDate} 
-                    onChange={e => setSelectedDate(e.target.value)}
-                    className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-2 rounded-xl font-semibold text-sm focus:ring-0 focus:border-indigo-300"
+                    value={selectedRouteId} 
+                    onChange={e => setSelectedRouteId(e.target.value)}
+                    className="uppercase bg-white border border-gray-200 text-gray-700 pl-2 pr-8 sm:pl-3 sm:pr-10 py-1 sm:py-1.5 rounded-lg font-semibold text-xs sm:text-sm focus:ring-0 focus:border-indigo-300"
                 >
-                    {uniqueDates.length === 0 && <option value="">Sin rutas asignadas</option>}
-                    {uniqueDates.map(date => (
-                        <option key={date} value={date}>{new Date(date + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</option>
+                    {routesForDate.map((route, idx) => (
+                        <option key={route.id} value={route.id}>
+                            Ruta {idx + 1}
+                        </option>
                     ))}
                 </select>
-
-                {routesForDate.length > 1 && (
-                    <select 
-                        value={selectedRouteId} 
-                        onChange={e => setSelectedRouteId(e.target.value)}
-                        className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold text-sm focus:ring-0 focus:border-indigo-300"
-                    >
-                        {routesForDate.map((route, idx) => (
-                            <option key={route.id} value={route.id}>
-                                Ruta {idx + 1} (Camión: {route.truck?.license_plate})
-                            </option>
-                        ))}
-                    </select>
-                )}
-            </div>
-
-            {activeRoute && (
-                <button
-                    onClick={handleStartRoute}
-                    disabled={!!activeRoute.started_at || activeRoute.status === 'completada'}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2 ${
-                        activeRoute.status === 'completada'
-                            ? 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-90'
-                            : activeRoute.started_at
-                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200 cursor-not-allowed opacity-90'
-                                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/30'
-                    }`}
-                >
-                    {activeRoute.status === 'completada' ? (
-                        <>
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>
-                            Finalizado
-                        </>
-                    ) : activeRoute.started_at ? (
-                        <>
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Iniciado: {new Date(activeRoute.started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </>
-                    ) : (
-                        <>
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Comenzar Despacho
-                        </>
-                    )}
-                </button>
             )}
+        </div>
+    );
+
+    // Footer Left (Action Button)
+    const footerLeft = activeRoute ? (
+        activeRoute.status === 'completada' ? (
+            <span className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500 border border-gray-200 text-xs font-bold flex items-center gap-1 shadow-sm opacity-90">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>
+                Finalizado
+            </span>
+        ) : activeRoute.started_at ? (
+            <button
+                onClick={handleFinishRoute}
+                className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white border border-red-700 text-xs font-bold flex items-center gap-1 shadow-sm transition-transform active:scale-95"
+            >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
+                <span>Finalizar</span>
+            </button>
+        ) : (
+            <button
+                onClick={handleStartRoute}
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white border border-indigo-700 text-xs font-bold flex items-center gap-1 shadow-sm transition-transform active:scale-95"
+            >
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Comenzar</span>
+            </button>
+        )
+    ) : null;
+
+    // Footer Center (Timer)
+    const footerCenter = (
+        <div className="flex flex-col items-center justify-center text-center">
+            <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold tracking-wider leading-none mb-0.5">
+                Tiempo Total
+            </span>
+            <span className={`font-mono text-xs sm:text-sm font-bold leading-none tracking-tight ${
+                activeRoute?.status === 'completada' ? 'text-gray-500' : 
+                activeRoute?.started_at ? 'text-indigo-600' : 'text-gray-400'
+            }`}>
+                {elapsedTime}
+            </span>
         </div>
     );
 
@@ -247,7 +344,7 @@ export default function Home({ assignedRoutes }) {
     }, [activeRoute]);
 
     return (
-        <DriverLayout headerLeft={headerLeft}>
+        <DriverLayout headerRight={headerRight} footerLeft={footerLeft} footerCenter={footerCenter}>
             <Head title="Mis Rutas" />
 
             {!activeRoute ? (
@@ -329,10 +426,6 @@ export default function Home({ assignedRoutes }) {
                                                     <h5 className={`text-base font-bold ${isDelivered ? 'text-gray-500' : 'text-gray-900'}`}>
                                                         {dispatch.client?.name || 'Cliente Eliminado'}
                                                     </h5>
-                                                    <p className="text-sm text-gray-500 mt-0.5 flex items-start gap-1">
-                                                        <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                        {dispatch.client?.address || 'Sin dirección registrada'}
-                                                    </p>
                                                     
                                                     {isDelivered && dispatch.dispatched_at && (
                                                         <div className="mt-2 text-[11px] font-semibold text-green-700 bg-green-100 px-2 py-1 rounded inline-flex items-center gap-1">
@@ -344,12 +437,36 @@ export default function Home({ assignedRoutes }) {
                                             </div>
                                             
                                             {!isDelivered && (
-                                                <div className="pl-14">
+                                                <div className="pl-14 flex flex-wrap gap-2">
+                                                    <button
+                                                        onClick={() => openClientInfoModal(dispatch.client)}
+                                                        className="flex-shrink-0 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-bold flex items-center justify-center transition-transform active:scale-95 shadow-sm border border-gray-200"
+                                                        title="Ver Detalles"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                    </button>
+                                                    {dispatch.client?.latitude && dispatch.client?.longitude && (
+                                                        <a
+                                                            href={`https://www.google.com/maps/dir/?api=1&destination=${dispatch.client.latitude},${dispatch.client.longitude}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold flex items-center justify-center transition-transform active:scale-95 shadow-sm"
+                                                            title="Navegar"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            </svg>
+                                                        </a>
+                                                    )}
                                                     <button
                                                         onClick={() => openDispatchModal(dispatch)}
-                                                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-sm"
+                                                        className="w-auto bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-transform active:scale-95 shadow-sm"
                                                     >
-                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                                         Confirmar Entrega
                                                     </button>
                                                 </div>
@@ -379,6 +496,44 @@ export default function Home({ assignedRoutes }) {
                     </div>
                 </div>
             )}
+
+            {/* Modal de Información del Cliente */}
+            <Modal show={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} maxWidth="md">
+                <div className="bg-white rounded-2xl overflow-hidden shadow-xl">
+                    <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                            <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Detalles del Cliente
+                        </h3>
+                        <button onClick={() => setIsInfoModalOpen(false)} className="text-gray-400 hover:text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-full p-1 transition-colors">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div className="p-5">
+                        <h4 className="font-bold text-xl text-gray-900 mb-1">{selectedClientInfo?.name || 'Cliente'}</h4>
+                        <p className="text-sm text-gray-600 mb-4 flex items-start gap-2">
+                            <svg className="w-4 h-4 mt-0.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            {selectedClientInfo?.address || 'Sin dirección registrada'}
+                        </p>
+                        
+                        <div className="w-full h-48 bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                            {selectedClientInfo && <ClientMap client={selectedClientInfo} />}
+                        </div>
+                        
+                        <div className="mt-5 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setIsInfoModalOpen(false)}
+                                className="w-full sm:w-auto px-5 py-2 text-sm font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none transition-colors shadow-sm"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
 
             {/* Modal de Confirmación de Entrega */}
             <Modal show={isModalOpen} onClose={() => !processing && setIsModalOpen(false)} maxWidth="md">
