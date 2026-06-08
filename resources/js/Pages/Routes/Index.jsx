@@ -74,7 +74,16 @@ export default function Index({ routes, isDriver }) {
 
     // Rendering map logic
     useEffect(() => {
-        if (!routeDetails || !mapRef.current || !viewingRouteId) return;
+        if (!viewingRouteId) {
+            // Cleanup map when modal closes to prevent attaching to unmounted DOM nodes
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+            return;
+        }
+
+        if (!routeDetails || !mapRef.current) return;
 
         // Give modal a tiny delay to render the ref completely
         const timer = setTimeout(() => {
@@ -163,7 +172,9 @@ export default function Index({ routes, isDriver }) {
                 }
                 
                 // Force leaflet to re-calculate layout inside modal
-                setTimeout(() => { mapInstanceRef.current.invalidateSize(); }, 300);
+                setTimeout(() => { if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize(); }, 100);
+                setTimeout(() => { if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize(); }, 400);
+                setTimeout(() => { if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize(); }, 800);
             }
         }, 100);
 
