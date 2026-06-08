@@ -38,7 +38,7 @@ Route::get('/dashboard', function () {
 
     $stats = [
         'companies' => $authUser->isSuperAdmin() ? \App\Models\Company::count() : 0,
-        'users' => \App\Models\User::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
+        'users' => \App\Models\User::when($companyId, fn($q) => $q->where('company_id', $companyId))->where('role', '!=', 'chofer')->count(),
         'drivers' => \App\Models\User::when($companyId, fn($q) => $q->where('company_id', $companyId))->where('role', 'chofer')->count(),
         'trucks' => \App\Models\Truck::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
         'routes' => \App\Models\Route::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
@@ -47,7 +47,9 @@ Route::get('/dashboard', function () {
     $companiesStats = [];
     if ($authUser->isSuperAdmin()) {
         $companiesStats = \App\Models\Company::withCount([
-            'users',
+            'users as users_count' => function ($query) {
+                $query->where('role', '!=', 'chofer');
+            },
             'users as drivers_count' => function ($query) {
                 $query->where('role', 'chofer');
             },
