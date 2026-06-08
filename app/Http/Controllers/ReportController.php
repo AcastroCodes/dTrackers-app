@@ -17,7 +17,7 @@ class ReportController extends Controller
         $user = $request->user();
         
         $query = Route::with(['company', 'driver', 'truck'])
-            ->where('status', 'finalizada');
+            ->where('status', 'completada');
 
         // Filter by company if not superadmin
         if (!$user->isSuperAdmin()) {
