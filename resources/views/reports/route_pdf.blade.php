@@ -139,7 +139,7 @@
             <th>Chofer Asignado</th>
             <td>{{ $route->driver ? $route->driver->name : 'No asignado' }}</td>
             <th>Vehículo (Placas)</th>
-            <td>{{ $route->truck ? $route->truck->plates : 'No asignado' }}</td>
+            <td>{{ $route->truck ? $route->truck->license_plate : 'No asignado' }}</td>
         </tr>
         <tr>
             <th>Distancia Total</th>

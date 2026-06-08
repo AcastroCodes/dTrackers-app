@@ -91,7 +91,7 @@ export default function Index({ auth, routes, filters }) {
                                                     <td>{new Date(r.date + 'T00:00:00').toLocaleDateString()}</td>
                                                     {auth.user.role === 'superadmin' && <td>{r.company?.name || 'N/A'}</td>}
                                                     <td>{r.driver?.name || 'No Asignado'}</td>
-                                                    <td>{r.truck?.plates || 'No Asignado'}</td>
+                                                    <td>{r.truck?.license_plate || 'No Asignado'}</td>
                                                     <td>{r.total_distance_km ? `${r.total_distance_km} km` : '-'}</td>
                                                     <td className="text-right">
                                                         <a
