@@ -45,6 +45,18 @@ Route::get('/dashboard', function () {
                             ->count(),
     ];
 
+    $companiesStats = [];
+    if ($authUser->isSuperAdmin()) {
+        $companiesStats = \App\Models\Company::withCount([
+            'users',
+            'users as drivers_count' => function ($query) {
+                $query->where('role', 'chofer');
+            },
+            'trucks',
+            'routes'
+        ])->get();
+    }
+
     $recentRoutes = \App\Models\Route::with(['company', 'driver', 'truck', 'dispatches'])
         ->when($companyId, fn($q) => $q->where('company_id', $companyId))
         ->latest()
@@ -53,6 +65,7 @@ Route::get('/dashboard', function () {
 
     return Inertia::render('Dashboard', [
         'stats' => $stats,
+        'companiesStats' => $companiesStats,
         'recentRoutes' => $recentRoutes,
         'isSuperAdmin' => $authUser->isSuperAdmin(),
         'isDriver' => false,

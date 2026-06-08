@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 
-export default function Dashboard({ stats, recentRoutes, isSuperAdmin, isDriver }) {
+export default function Dashboard({ stats, companiesStats, recentRoutes, isSuperAdmin, isDriver }) {
     
     useEffect(() => {
         // Initialize charts if demo.js is loaded
@@ -117,6 +117,45 @@ export default function Dashboard({ stats, recentRoutes, isSuperAdmin, isDriver 
                     </div>
                 </div>
             </div>
+
+            {isSuperAdmin && companiesStats && companiesStats.length > 0 && (
+                <div className="row mt-2 mb-4">
+                    <div className="col-12">
+                        <h5 className="card-title mb-3" style={{ fontWeight: '600', color: '#51cbce' }}>
+                            <i className="nc-icon nc-bank mr-2"></i> Resumen por Empresas
+                        </h5>
+                    </div>
+                    {companiesStats.map(company => (
+                        <div key={company.id} className="col-lg-3 col-md-6 col-sm-12 mb-3">
+                            <div className="card h-100 shadow-sm" style={{ borderTop: '4px solid #51cbce' }}>
+                                <div className="card-header pb-0">
+                                    <h6 className="card-title text-dark font-weight-bold">{company.name}</h6>
+                                </div>
+                                <div className="card-body pt-2">
+                                    <ul className="list-group list-group-flush">
+                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                                            <span className="text-muted"><i className="nc-icon nc-single-02 mr-1"></i> Usuarios</span>
+                                            <span className="badge badge-secondary badge-pill">{company.users_count}</span>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                                            <span className="text-muted"><i className="nc-icon nc-badge mr-1"></i> Choferes</span>
+                                            <span className="badge badge-info badge-pill">{company.drivers_count}</span>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                                            <span className="text-muted"><i className="nc-icon nc-delivery-fast mr-1"></i> Camiones</span>
+                                            <span className="badge badge-danger badge-pill">{company.trucks_count}</span>
+                                        </li>
+                                        <li className="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0">
+                                            <span className="text-muted"><i className="nc-icon nc-pin-3 mr-1"></i> Rutas</span>
+                                            <span className="badge badge-success badge-pill">{company.routes_count}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             <div className="row">
                 <div className="col-md-12">
