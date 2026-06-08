@@ -16,7 +16,34 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
             <Head title="Dashboard" />
 
             <div className="row">
-                <div className="col-lg-3 col-md-6 col-sm-6">
+                {isSuperAdmin && (
+                    <div className="col-lg col-md-4 col-sm-6">
+                        <div className="card card-stats">
+                            <div className="card-body">
+                                <div className="row">
+                                    <div className="col-5 col-md-4">
+                                        <div className="icon-big text-center icon-warning">
+                                            <i className="nc-icon nc-bank text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div className="col-7 col-md-8">
+                                        <div className="numbers">
+                                            <p className="card-category">Empresas</p>
+                                            <p className="card-title">{stats?.companies || 0}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="card-footer">
+                                <hr />
+                                <div className="stats">
+                                    <i className="fa fa-refresh"></i> Total Registradas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <div className="col-lg col-md-4 col-sm-6">
                     <div className="card card-stats">
                         <div className="card-body">
                             <div className="row">
@@ -27,7 +54,7 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                                 </div>
                                 <div className="col-7 col-md-8">
                                     <div className="numbers">
-                                        <p className="card-category">Usuarios Registrados</p>
+                                        <p className="card-category">Usuarios</p>
                                         <p className="card-title">{stats?.users || 0}</p>
                                     </div>
                                 </div>
@@ -36,24 +63,24 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                         <div className="card-footer">
                             <hr />
                             <div className="stats">
-                                <i className="fa fa-refresh"></i> Update Now
+                                <i className="fa fa-refresh"></i> Total
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-lg-3 col-md-6 col-sm-6">
+                <div className="col-lg col-md-4 col-sm-6">
                     <div className="card card-stats">
                         <div className="card-body">
                             <div className="row">
                                 <div className="col-5 col-md-4">
                                     <div className="icon-big text-center icon-warning">
-                                        <i className="nc-icon nc-circle-10 text-success"></i>
+                                        <i className="nc-icon nc-badge text-success"></i>
                                     </div>
                                 </div>
                                 <div className="col-7 col-md-8">
                                     <div className="numbers">
-                                        <p className="card-category">Clientes Activos</p>
-                                        <p className="card-title">{stats?.clients || 0}</p>
+                                        <p className="card-category">Choferes</p>
+                                        <p className="card-title">{stats?.drivers || 0}</p>
                                     </div>
                                 </div>
                             </div>
@@ -61,12 +88,12 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                         <div className="card-footer">
                             <hr />
                             <div className="stats">
-                                <i className="fa fa-calendar-o"></i> Last day
+                                <i className="fa fa-refresh"></i> Total
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-lg-3 col-md-6 col-sm-6">
+                <div className="col-lg col-md-4 col-sm-6">
                     <div className="card card-stats">
                         <div className="card-body">
                             <div className="row">
@@ -86,24 +113,24 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                         <div className="card-footer">
                             <hr />
                             <div className="stats">
-                                <i className="fa fa-clock-o"></i> In the last hour
+                                <i className="fa fa-refresh"></i> Total
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-lg-3 col-md-6 col-sm-6">
+                <div className="col-lg col-md-4 col-sm-6">
                     <div className="card card-stats">
                         <div className="card-body">
                             <div className="row">
                                 <div className="col-5 col-md-4">
                                     <div className="icon-big text-center icon-warning">
-                                        <i className="nc-icon nc-pin-3 text-primary"></i>
+                                        <i className="nc-icon nc-pin-3 text-info"></i>
                                     </div>
                                 </div>
                                 <div className="col-7 col-md-8">
                                     <div className="numbers">
-                                        <p className="card-category">Rutas para Hoy</p>
-                                        <p className="card-title">{stats?.routes_today || 0}</p>
+                                        <p className="card-category">Rutas</p>
+                                        <p className="card-title">{stats?.routes || 0}</p>
                                     </div>
                                 </div>
                             </div>
@@ -111,7 +138,7 @@ export default function Dashboard({ stats, companiesStats, recentRoutes, isSuper
                         <div className="card-footer">
                             <hr />
                             <div className="stats">
-                                <i className="fa fa-refresh"></i> Update now
+                                <i className="fa fa-refresh"></i> Total
                             </div>
                         </div>
                     </div>

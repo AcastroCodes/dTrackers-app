@@ -37,12 +37,11 @@ Route::get('/dashboard', function () {
     $companyId = $authUser->isSuperAdmin() ? null : $authUser->company_id;
 
     $stats = [
+        'companies' => $authUser->isSuperAdmin() ? \App\Models\Company::count() : 0,
         'users' => \App\Models\User::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
-        'clients' => \App\Models\Client::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
+        'drivers' => \App\Models\User::when($companyId, fn($q) => $q->where('company_id', $companyId))->where('role', 'chofer')->count(),
         'trucks' => \App\Models\Truck::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
-        'routes_today' => \App\Models\Route::when($companyId, fn($q) => $q->where('company_id', $companyId))
-                            ->where('date', today()->toDateString())
-                            ->count(),
+        'routes' => \App\Models\Route::when($companyId, fn($q) => $q->where('company_id', $companyId))->count(),
     ];
 
     $companiesStats = [];
