@@ -61,23 +61,6 @@ export default function Welcome({ auth }) {
                             Potencia tu flujo de trabajo con dTrackers. La plataforma definitiva para gestionar 
                             usuarios y datos con una interfaz intuitiva y potentes herramientas de análisis.
                         </p>
-
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            {!auth.user && (
-                                <Link
-                                    href={route('register')}
-                                    className="px-8 py-4 rounded-2xl bg-white text-gray-900 font-bold hover:bg-gray-100 transition-all duration-300 shadow-xl shadow-white/5"
-                                >
-                                    Comenzar Ahora
-                                </Link>
-                            )}
-                            <a
-                                href="#features"
-                                className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all duration-300 backdrop-blur-md"
-                            >
-                                Saber más
-                            </a>
-                        </div>
                     </main>
 
                     <footer className="py-12 border-t border-white/5 text-center text-gray-500 text-sm">
