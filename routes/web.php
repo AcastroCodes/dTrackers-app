@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\TruckController;
@@ -86,6 +87,9 @@ Route::middleware('auth')->group(function () {
     Route::post('routes/{route}/start', [RouteController::class, 'startRoute'])->name('routes.start');
     Route::post('routes/{route}/finish', [RouteController::class, 'finishRoute'])->name('routes.finish');
     Route::post('routes/dispatches/{dispatch}/mark-delivered', [RouteController::class, 'markDispatchDelivered'])->name('dispatches.mark_delivered');
+
+    Route::get('reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/{route}/pdf', [\App\Http\Controllers\ReportController::class, 'downloadPdf'])->name('reports.pdf');
 });
 
 require __DIR__.'/auth.php';

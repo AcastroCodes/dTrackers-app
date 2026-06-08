@@ -59,6 +59,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             Rutas
                         </SidebarLink>
 
+                        {user.role !== 'chofer' && (
+                            <SidebarLink href={route('reports.index')} active={route().current('reports.*')} icon="nc-paper">
+                                Reportes
+                            </SidebarLink>
+                        )}
+
                         {user.role === 'superadmin' && (
                             <li>
                                 <a href="#" onClick={(e) => { e.preventDefault(); setConfigOpen(!configOpen); }}>
