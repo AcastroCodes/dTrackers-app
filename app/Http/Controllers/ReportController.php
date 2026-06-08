@@ -15,6 +15,10 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+
+        if ($user->isDriver()) {
+            abort(403, 'No tienes permiso para acceder a los reportes.');
+        }
         
         $query = Route::with(['company', 'driver', 'truck'])
             ->where('status', 'completada');
@@ -49,6 +53,10 @@ class ReportController extends Controller
     public function downloadPdf(Request $request, Route $route)
     {
         $user = $request->user();
+
+        if ($user->isDriver()) {
+            abort(403, 'No tienes permiso para descargar reportes.');
+        }
 
         // Ensure the user has access to this route
         if (!$user->isSuperAdmin() && $route->company_id !== $user->company_id) {
