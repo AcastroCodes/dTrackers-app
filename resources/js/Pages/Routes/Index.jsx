@@ -466,7 +466,8 @@ export default function Index({ routes, isDriver }) {
                         )}
                         
                         {/* Lado Izquierdo: Lista */}
-                        <div className="w-full lg:w-5/12 border-r border-gray-100 dark:border-slate-800 overflow-y-auto bg-white dark:bg-slate-900 p-3 space-y-2.5">
+                        <div className="w-full lg:w-5/12 border-r border-gray-100 dark:border-slate-800 flex flex-col bg-white dark:bg-slate-900">
+                            <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
                             <h4 className="text-sm font-bold text-gray-800 dark:text-slate-200 uppercase tracking-wide sticky top-0 bg-white dark:bg-slate-900 py-2 z-10">
                                 Hoja de Ruta Detallada
                             </h4>
@@ -545,13 +546,16 @@ export default function Index({ routes, isDriver }) {
                                 );
                             })}
 
+                            </div>
+
+                            {/* Tarjeta de métricas fijada al fondo del lado izquierdo */}
                             {routeMetrics && (
-                                <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center shadow-sm">
+                                <div className="p-4 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-800 flex justify-between items-center shrink-0">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Distancia Total</span>
                                         <span className="text-sm font-bold text-gray-800 dark:text-slate-200">{(routeMetrics.distance / 1000).toFixed(1)} km</span>
                                     </div>
-                                    <div className="w-px h-8 bg-indigo-200 dark:bg-indigo-800/50"></div>
+                                    <div className="w-px h-8 bg-gray-200 dark:bg-slate-700"></div>
                                     <div className="flex flex-col text-right">
                                         <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Tiempo Estimado</span>
                                         <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
