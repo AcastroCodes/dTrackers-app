@@ -19,6 +19,7 @@ export default function Index({ routes, isDriver }) {
     const [viewingRouteId, setViewingRouteId] = useState(null);
     const [routeDetails, setRouteDetails] = useState(null);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+    const [routeMetrics, setRouteMetrics] = useState(null);
     
     const mapRef = useRef(null);
     const mapInstanceRef = useRef(null);
@@ -70,6 +71,7 @@ export default function Index({ routes, isDriver }) {
     const closeViewModal = () => {
         setViewingRouteId(null);
         setRouteDetails(null);
+        setRouteMetrics(null);
     };
 
     // Rendering map logic
@@ -157,6 +159,10 @@ export default function Index({ routes, isDriver }) {
                         .then(res => {
                             if (res.data.routes && res.data.routes[0]) {
                                 const geometry = res.data.routes[0].geometry;
+                                const distance = res.data.routes[0].distance;
+                                const duration = res.data.routes[0].duration;
+                                setRouteMetrics({ distance, duration });
+                                
                                 routeLayerRef.current = L.geoJSON(geometry, {
                                     style: { color: '#4f46e5', weight: 5, opacity: 0.7 }
                                 }).addTo(mapInstanceRef.current);
@@ -538,6 +544,24 @@ export default function Index({ routes, isDriver }) {
                                     </details>
                                 );
                             })}
+
+                            {routeMetrics && (
+                                <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center shadow-sm">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Distancia Total</span>
+                                        <span className="text-sm font-bold text-gray-800 dark:text-slate-200">{(routeMetrics.distance / 1000).toFixed(1)} km</span>
+                                    </div>
+                                    <div className="w-px h-8 bg-indigo-200 dark:bg-indigo-800/50"></div>
+                                    <div className="flex flex-col text-right">
+                                        <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Tiempo Estimado</span>
+                                        <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
+                                            {routeMetrics.duration > 3600 
+                                                ? `${Math.floor(routeMetrics.duration / 3600)}h ${Math.floor((routeMetrics.duration % 3600) / 60)}m` 
+                                                : `${Math.floor(routeMetrics.duration / 60)} min`}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Lado Derecho: Mapa */}
