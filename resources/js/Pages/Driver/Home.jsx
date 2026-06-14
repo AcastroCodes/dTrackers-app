@@ -60,6 +60,8 @@ export default function Home({ assignedRoutes }) {
     const routeLayerRef = useRef(null);
     const markersRef = useRef([]);
 
+    const [routeMetrics, setRouteMetrics] = useState(null);
+
     // Selectors State
     const uniqueDates = [...new Set(assignedRoutes.map(r => r.date))].sort();
     const [selectedDate, setSelectedDate] = useState(uniqueDates.length > 0 ? uniqueDates[0] : '');
@@ -251,6 +253,7 @@ export default function Home({ assignedRoutes }) {
 
     // Map Rendering Logic
     useEffect(() => {
+        setRouteMetrics(null);
         if (!activeRoute || !mapRef.current) return;
 
         const coords = [];
@@ -331,6 +334,11 @@ export default function Home({ assignedRoutes }) {
                                 style: { color: '#4f46e5', weight: 5, opacity: 0.7 }
                             }).addTo(mapInstanceRef.current);
                             mapInstanceRef.current.fitBounds(routeLayerRef.current.getBounds(), { padding: [30, 30] });
+                            
+                            setRouteMetrics({
+                                distance: res.data.routes[0].distance,
+                                duration: res.data.routes[0].duration
+                            });
                         }
                     })
                     .catch(() => {
@@ -381,6 +389,24 @@ export default function Home({ assignedRoutes }) {
                                 Hoja de Ruta Detallada
                             </h3>
                         </div>
+
+                        {routeMetrics && (
+                            <div className="bg-indigo-50/50 border-b border-indigo-100 px-5 py-3 flex justify-between items-center">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Distancia Total</span>
+                                    <span className="text-sm font-bold text-gray-800">{(routeMetrics.distance / 1000).toFixed(1)} km</span>
+                                </div>
+                                <div className="w-px h-8 bg-indigo-200"></div>
+                                <div className="flex flex-col text-right">
+                                    <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Tiempo Estimado</span>
+                                    <span className="text-sm font-bold text-gray-800">
+                                        {routeMetrics.duration > 3600 
+                                            ? `${Math.floor(routeMetrics.duration / 3600)}h ${Math.floor((routeMetrics.duration % 3600) / 60)}m` 
+                                            : `${Math.floor(routeMetrics.duration / 60)} min`}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="p-4 sm:p-6 space-y-4">
                             
