@@ -1,8 +1,44 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function Show({ route, isDriver }) {
     const { post, processing } = useForm();
+    const [routeMetrics, setRouteMetrics] = useState(null);
+
+    useEffect(() => {
+        if (!route || !route.dispatches || route.dispatches.length === 0) return;
+
+        const coords = [];
+        const companyCoords = route.company?.latitude && route.company?.longitude 
+            ? [parseFloat(route.company.latitude), parseFloat(route.company.longitude)] 
+            : null;
+        
+        if (companyCoords) coords.push(companyCoords);
+
+        route.dispatches.forEach(d => {
+            if (d.client?.latitude && d.client?.longitude) {
+                coords.push([parseFloat(d.client.latitude), parseFloat(d.client.longitude)]);
+            }
+        });
+
+        if (companyCoords && coords.length > 1) coords.push(companyCoords);
+
+        if (coords.length > 1) {
+            const waypoints = coords.map(c => `${c[1]},${c[0]}`).join(';');
+            axios.get(`https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=false`)
+                .then(res => {
+                    if (res.data.routes && res.data.routes[0]) {
+                        setRouteMetrics({
+                            distance: res.data.routes[0].distance,
+                            duration: res.data.routes[0].duration
+                        });
+                    }
+                })
+                .catch(err => console.error("OSRM Error", err));
+        }
+    }, [route]);
 
     const handleMarkDelivered = (dispatchId) => {
         if (confirm('¿Confirmas que este despacho ha sido entregado?')) {
@@ -63,7 +99,25 @@ export default function Show({ route, isDriver }) {
 
                 {/* Dispatches List */}
                 <div className="space-y-4">
-                    <h4 className="text-lg font-bold text-gray-800 dark:text-white px-2">Hoja de Despachos</h4>
+                    <h4 className="text-lg font-bold text-gray-800 dark:text-white px-2">Hoja de Ruta Detallada</h4>
+
+                    {routeMetrics && (
+                        <div className="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-900/50 flex justify-between items-center shadow-sm">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Distancia Total Estimada</span>
+                                <span className="text-sm font-bold text-gray-800 dark:text-slate-200">{(routeMetrics.distance / 1000).toFixed(1)} km</span>
+                            </div>
+                            <div className="w-px h-8 bg-indigo-200 dark:bg-indigo-800/50"></div>
+                            <div className="flex flex-col text-right">
+                                <span className="text-[10px] uppercase font-bold text-indigo-500 mb-0.5">Tiempo de Conducción</span>
+                                <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
+                                    {routeMetrics.duration > 3600 
+                                        ? `${Math.floor(routeMetrics.duration / 3600)}h ${Math.floor((routeMetrics.duration % 3600) / 60)}m` 
+                                        : `${Math.floor(routeMetrics.duration / 60)} min`}
+                                </span>
+                            </div>
+                        </div>
+                    )}
                     
                     {route.dispatches.map((dispatch, index) => {
                         const isDelivered = dispatch.status === 'entregado';
