@@ -17,8 +17,8 @@ export default function MapPickerModal({ isOpen, onClose, onConfirm, initialLat,
     const markerRef = useRef(null);
 
     const [coords, setCoords] = useState({
-        lat: initialLat || null,
-        lng: initialLng || null,
+        lat: initialLat !== null && initialLat !== undefined ? parseFloat(initialLat) : null,
+        lng: initialLng !== null && initialLng !== undefined ? parseFloat(initialLng) : null,
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [searching, setSearching] = useState(false);
