@@ -18,6 +18,10 @@ class Truck extends Model
         'description',
     ];
 
+    protected $casts = [
+        'company_id' => 'integer',
+    ];
+
     /**
      * Get the company that owns the truck.
      */

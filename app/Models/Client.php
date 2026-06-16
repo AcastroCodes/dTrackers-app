@@ -19,6 +19,12 @@ class Client extends Model
         'longitude',
     ];
 
+    protected $casts = [
+        'company_id' => 'integer',
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
     /**
      * Get the company that owns the client.
      */

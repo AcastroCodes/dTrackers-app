@@ -21,6 +21,8 @@ class Dispatch extends Model
     ];
 
     protected $casts = [
+        'route_id' => 'integer',
+        'client_id' => 'integer',
         'dispatched_at' => 'datetime',
     ];
 
