@@ -208,9 +208,9 @@ class RouteController extends Controller
             return [
                 'id' => $dispatch->id,
                 'client_id' => $dispatch->client_id,
-                'client_name' => $dispatch->client->name,
-                'client_lat' => (float) $dispatch->client->latitude,
-                'client_lng' => (float) $dispatch->client->longitude,
+                'client_name' => $dispatch->client ? $dispatch->client->name : 'Cliente Eliminado',
+                'client_lat' => $dispatch->client ? (float) $dispatch->client->latitude : 0,
+                'client_lng' => $dispatch->client ? (float) $dispatch->client->longitude : 0,
                 'products' => $dispatch->products->map(function ($product) {
                     return [
                         'product_name' => $product->product_name,
