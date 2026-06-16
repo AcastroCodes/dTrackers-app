@@ -24,6 +24,9 @@ class Route extends Model
     ];
 
     protected $casts = [
+        'company_id' => 'integer',
+        'truck_id' => 'integer',
+        'user_id' => 'integer',
         'started_at' => 'datetime',
     ];
 
