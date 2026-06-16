@@ -20,6 +20,8 @@ export default function Index({ routes, isDriver }) {
     const [routeDetails, setRouteDetails] = useState(null);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
     const [routeMetrics, setRouteMetrics] = useState(null);
+    const [infoModalOpen, setInfoModalOpen] = useState(false);
+    const [infoMessage, setInfoMessage] = useState('');
     
     const mapRef = useRef(null);
     const mapInstanceRef = useRef(null);
@@ -385,15 +387,31 @@ export default function Index({ routes, isDriver }) {
                                         </a>
                                         {!isDriver && (
                                             <>
-                                                <Link
-                                                    href={route('routes.edit', rt.id)}
-                                                    className="inline-flex items-center p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all"
-                                                    title="Editar Ruta"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                </Link>
+                                                {st === 'pendiente' ? (
+                                                    <Link
+                                                        href={route('routes.edit', rt.id)}
+                                                        className="inline-flex items-center p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all"
+                                                        title="Editar Ruta"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </Link>
+                                                ) : (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setInfoMessage(`No es posible editar esta ruta porque se encuentra en estado "${st.toUpperCase()}". Solo se pueden editar rutas que están Pendientes.`);
+                                                            setInfoModalOpen(true);
+                                                        }}
+                                                        className="inline-flex items-center p-2 text-gray-400 dark:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all"
+                                                        title="Editar Ruta (No permitido)"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                )}
                                                 <button
                                                 onClick={() => handleDelete(rt.id)}
                                                 className="inline-flex items-center p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
@@ -571,6 +589,35 @@ export default function Index({ routes, isDriver }) {
                         {/* Lado Derecho: Mapa */}
                         <div className="w-full lg:w-7/12 h-64 lg:h-auto relative bg-slate-100 dark:bg-slate-800">
                             <div ref={mapRef} className="absolute inset-0 z-0"></div>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Info Modal */}
+            <Modal show={infoModalOpen} onClose={() => setInfoModalOpen(false)} maxWidth="sm">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-xl">
+                    <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <svg className="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            Acción no permitida
+                        </h3>
+                        <button onClick={() => setInfoModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <div className="p-5">
+                        <p className="text-sm text-gray-600 dark:text-slate-300">{infoMessage}</p>
+                        <div className="mt-5 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setInfoModalOpen(false)}
+                                className="px-4 py-2 text-sm font-bold text-gray-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Entendido
+                            </button>
                         </div>
                     </div>
                 </div>
